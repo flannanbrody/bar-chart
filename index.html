@@ -1,0 +1,94 @@
+<!-- shamelessly stolen from scott murray: http://alignedleft.com/tutorials -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <style type="text/css">
+            svg {
+              border: 2px solid orange;
+            }
+
+            .testbar {
+              fill: #ff00ff;
+            }
+
+            .bar {
+              fill: #ddd;
+            }
+
+            .g-ESPN {
+              fill: red;
+            }
+        </style>
+
+    </head>
+    <body>
+        <script type="text/javascript">
+            // Your beautiful D3 code will go here
+            d3.select("body").append("h1").text("My first bar chart")
+
+            var margin = {top: 20, right: 10, bottom: 20, left: 10};
+
+            var width = 600 - margin.left - margin.right,
+            height = 250 - margin.top - margin.bottom;
+
+            var svg = d3.select("body").append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var testRectangle = svg.append("rect")
+                .attr("x", 20)
+                .attr("y", 100)
+                .attr("height", 50)
+                .attr("width", 200)
+                .attr("class", "testbar");
+
+            d3.csv("subscription-prices.csv", function(err, prices) { 
+                prices.forEach(function(d) {
+                    // recasts d.2013 as a number, not a string
+                    d.X2013 = +d.X2013;
+                })
+
+                prices.sort(function(a,b) {
+return a.X2013 - b.X2013;
+});
+
+
+                var y = d3.scale.linear()
+                .domain([0,6])
+                .range([0,height]);
+
+                var x = d3.scale.linear()
+                .domain([0,prices.length])
+                .range([0,width]);
+
+                var bar = svg.selectAll(".bar")
+                  .data(prices)
+                .enter().append("rect")
+                  .attr("width", 2)
+                  .attr("height", function(d) { return y(d.X2013)} )
+                  .attr("y", function(d) { return height - y(d.X2013)  })
+                  .attr("x", function(d, i) { return 3 * i})
+                  .attr("class", "bar")
+                  .classed("g-ESPN", function(d) { return d.Network == "ESPN"});
+
+                  svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 530)
+                    .attr("y", 30)
+                    .text("ESPN")
+
+                    console.log(prices); 
+            });
+
+
+
+
+
+        </script>
+    </body>
+</html>
